@@ -1,0 +1,22 @@
+link:
+  ./alacritty/: ~/.config/alacritty
+
+  ./bspwm/: ~/.config/bspwm
+
+  ./cava/: ~/.config/cava
+
+  ./dunst/: ~/.config/dunst
+
+  ./fm6000/: ~/.config/fm6000
+
+  ./mpd/: ~/.config/mpd
+
+  ./ncmpcpp/: ~/.config/ncmpcpp
+
+  ./neofetch/: ~/.config/neofetch
+
+  ./picom/: ~/.config/picom
+
+  ./polybar/: ~/.config/polybar
+
+  ./sxhkd/: ~/.config/sxhkd

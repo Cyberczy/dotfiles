@@ -1,0 +1,113 @@
+#! /bin/sh
+
+# _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
+#                                                                   
+#   ██████╗ ███████╗██████╗ ██╗    ██╗███╗   ███╗██████╗  ██████╗   
+#   ██╔══██╗██╔════╝██╔══██╗██║    ██║████╗ ████║██╔══██╗██╔════╝   
+#   ██████╔╝███████╗██████╔╝██║ █╗ ██║██╔████╔██║██████╔╝██║        
+#   ██╔══██╗╚════██║██╔═══╝ ██║███╗██║██║╚██╔╝██║██╔══██╗██║        
+#   ██████╔╝███████║██║     ╚███╔███╔╝██║ ╚═╝ ██║██║  ██║╚██████╗   
+#   ╚═════╝ ╚══════╝╚═╝      ╚══╝╚══╝ ╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝   
+#                                                                   
+# -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_- 
+
+## 显示器设置
+if [[ $(xrandr -q | grep "DP-2 connected" | cut -d ' ' -f1) ]]; then
+  xrandr --output DP-2 --primary --mode 1920x1080 --rate 165 --output DP-4 --mode 2560x1440 --rate 165 --right-of DP-2
+
+  bspc monitor ^1 -d 1 2 3 4 5 6 7 8
+  bspc monitor ^2 -d 9 10
+
+  ~/.config/polybar/launchtwo.sh
+
+else
+  xrandr --output DP-4 --mode 2560x1440 --rate 165
+
+  bspc monitor -d 1 2 3 4 5 6 7 8 9 10
+
+  ~/.config/polybar/launchone.sh
+
+fi
+
+bspc config border_width          2
+bspc config window_gap            8
+
+bspc config focused_border_color  "#89B4FA" 
+bspc config normal_border_color   "#1E1E2E"
+
+bspc config split_ratio           0.50
+bspc config borderless_monocle    true
+bspc config gapless_monocle       true
+bspc config focus_follows_pointer true
+
+## 每个应用程序的特定设置
+# 2 > web (总是在工作区2上打开浏览器)
+declare -a web=(Chromium Google-chrome)
+for i in ${web[@]}; do
+bspc rule -a $i desktop='^2' follow=on focus=on; done
+
+# 3 > ide (总是在工作区3上打开ide)
+declare -a ide=(jetbrains-clion jetbrains-idea jetbrains-pycharm jetbrains-webstorm jetbrains-datagrip)
+for i in ${ide[@]}; do
+bspc rule -a $i desktop='^3' follow=on focus=on; done
+
+# 4 > note (总是在工作区4上打开笔记)
+declare -a note=(Typora obsidian)
+for i in ${note[@]}; do
+bspc rule -a $i desktop='^4' follow=on focus=on; done
+
+# 9 > music (总是在工作区9上打开音乐播放器)
+declare -a music=(yesplaymusic lx-music-desktop)
+for i in ${music[@]}; do
+bspc rule -a $i desktop='^9' follow=on focus=on; done
+
+# 10 > obs (总是在工作区10上打开obs studio)
+declare -a obs=(obs)
+for i in ${obs[@]}; do
+bspc rule -a $i desktop='^10' follow=on focus=on; done
+
+# float (总是为浮动状态)
+declare -a float=(alacritty-float st-float feh Pavucontrol)
+for i in ${float[@]}; do
+bspc rule -a $i state=floating follow=on focus=on; done
+
+# ncmpcpp
+bspc rule -a ncmpcpp state=floating rectangle=600x220+1308+46 sticky=on layer=above
+
+## 设置   
+# 初始化设置项
+settings() {
+  [ $1 ] && sleep $1
+  export _JAVA_AWT_WM_NONREPARENTING=1                                                  # 修复java应用程序
+  xset -b                                                                               # 关闭蜂鸣器
+  xset s off -dpms                                                                      # 关闭休眠
+  syndaemon -i 1 -t -K -R -d                                                            # 设置使用键盘时触控板短暂失效
+  xsetroot -cursor_name left_ptr                                                        # 修复光标
+  feh --randomize --bg-fill ~/Pictures/wallpaper/*.png                                  # 设置壁纸
+}
+
+# 后台程序项
+daemons() {
+  [ $1 ] && sleep $1
+  pgrep -x sxhkd > /dev/null || sxhkd &                                                 # sxhkd快捷键
+  pgrep -x fcitx5 > /dev/null || fcitx5 &                                               # fcitx5输入法
+  pgrep -x dunst > /dev/null || dunst &                                                 # dunst通知
+  pgrep -x udiskie > /dev/null || udiskie &                                             # u盘自动挂载
+  picom --experimental-backends --config ~/.config/picom/picom.conf >> /dev/null 2>&1 & # picom动画
+  mpd &                                                                                 # mpd音乐播放器
+  sleep 1 && /opt/YesPlayMusic/yesplaymusic &                                           # yesplaymusic音乐播放器
+}
+
+# 定时任务项
+cron() {
+  [ $1 ] && sleep $1
+  let i=10
+  while true; do
+    [ $((i % 300)) -eq 0 ] && feh --randomize --bg-fill ~/Pictures/wallpaper/*.png      # 每300秒更新壁纸
+    sleep 10; let i+=10
+  done
+}
+
+settings 1 &                                                                            # 初始化设置项
+daemons 3 &                                                                             # 后台程序项
+cron 5 &                                                                                # 定时任务项
