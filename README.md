@@ -1,3 +1,9 @@
+## Softlink
+
+Use [xdm](https://github.com/XXiaoA/xdm) to manage dotfiles.
+
+Run `xdm s` to fast create soft link.
+
 ## Files
 
 ```plaintext
