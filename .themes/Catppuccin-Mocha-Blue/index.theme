@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=Catppuccin-Mocha-Blue
+Comment=An Flat Gtk+ theme based on Elegant Design
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=Catppuccin-Mocha-Blue
+MetacityTheme=Catppuccin-Mocha-Blue
+IconTheme=Papirus-Mocha-Blue
+CursorTheme=Bibata-Modern-Ice
+ButtonLayout=close,minimize,maximize:menu
